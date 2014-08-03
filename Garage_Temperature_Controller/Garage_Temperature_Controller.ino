@@ -56,7 +56,7 @@ void loop() {
 
 		float humidity = sensors[i]->readHumidity();
 		float temperature = sensors[i]->readTemperature();
-		
+
 		if(sensor_data_is_bad(humidity, temperature)) {
 			continue;
 		}
