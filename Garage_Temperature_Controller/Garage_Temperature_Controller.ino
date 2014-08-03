@@ -71,6 +71,6 @@ void loop() {
 		Serial.print(F("\"temperature_celsius\": \"")); Serial.print(float_to_string(temperature)); Serial.print(F("\" }"));
 	}
 
-	Serial.println(F("] }"));
+	Serial.println(F(" ] }"));
 }
 
