@@ -19,7 +19,7 @@
 #define DHT_POLL_DELAY 2000
 
 
-DHT sensors[NUM_SENSORS];
+DHT *sensors[NUM_SENSORS];
 
 
 void setup() {
@@ -27,7 +27,8 @@ void setup() {
 	while(!Serial);  // Wait for serial, required at least on Leonardo devices
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
-		sensors[i].begin(FIRST_SENSOR_PIN + i, SENSOR_TYPE);
+		sensors[i] = new DHT(FIRST_SENSOR_PIN + i, SENSOR_TYPE);
+		sensors[i]->begin();
 	}
 }
 
@@ -51,8 +52,8 @@ void loop() {
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
 
-		float humidity = sensors[i].readHumidity();
-		float temperature = sensors[i].readTemperature();
+		float humidity = sensors[i]->readHumidity();
+		float temperature = sensors[i]->readTemperature();
 		
 		if(sensor_data_is_bad(humidity, temperature)) {
 			continue;
