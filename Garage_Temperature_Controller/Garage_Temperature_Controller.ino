@@ -48,7 +48,9 @@ String float_to_string(float in) {
 void loop() {
 	delay(DHT_POLL_DELAY);
 
-	Serial.print(F("{ \"message\": \"Sensor readings\", \"timestamp\": \"")); Serial.print(millis()); Serial.print(F("\""));
+	boolean first_loop = true;
+
+	Serial.print(F("{ \"message\": \"sensor_readings\", \"timestamp\": \"")); Serial.print(millis()); Serial.print(F("\", \"sensors\": [ "));
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
 
@@ -59,10 +61,16 @@ void loop() {
 			continue;
 		}
 
-		Serial.print(F(", \"humidity_percent_")); Serial.print(i); Serial.print(F("\": \"")); Serial.print(float_to_string(humidity)); Serial.print(F("\""));
-		Serial.print(F(", \"temperature_celsius_")); Serial.print(i); Serial.print(F("\": \"")); Serial.print(float_to_string(temperature)); Serial.print(F("\""));
+		if (first_loop) {
+			first_loop = false;
+		} else {
+			Serial.print(", ");
+		}
+
+		Serial.print(F("{ \"humidity_percent\": \"")); Serial.print(float_to_string(humidity)); Serial.print(F("\", "));
+		Serial.print(F("\"temperature_celsius\": \"")); Serial.print(float_to_string(temperature)); Serial.print(F("\" }"));
 	}
 
-	Serial.println(F(" }"));
+	Serial.println(F("] }"));
 }
 
