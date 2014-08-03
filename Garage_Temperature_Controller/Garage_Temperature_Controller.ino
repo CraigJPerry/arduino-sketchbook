@@ -19,7 +19,7 @@
 #define DHT_POLL_DELAY 2000
 
 
-DHT sensors[NUM_SENSORS];
+DHT *sensors[NUM_SENSORS];
 
 
 void setup() {
@@ -27,7 +27,8 @@ void setup() {
 	while(!Serial);  // Wait for serial, required at least on Leonardo devices
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
-		sensors[i].begin(FIRST_SENSOR_PIN + i, SENSOR_TYPE);
+		sensors[i] = new DHT(FIRST_SENSOR_PIN + i, SENSOR_TYPE);
+		sensors[i]->begin();
 	}
 }
 
@@ -47,21 +48,29 @@ String float_to_string(float in) {
 void loop() {
 	delay(DHT_POLL_DELAY);
 
-	Serial.print(F("{ \"message\": \"Sensor readings\", \"timestamp\": \"")); Serial.print(millis()); Serial.print(F("\""));
+	boolean first_loop = true;
+
+	Serial.print(F("{ \"message\": \"sensor_readings\", \"timestamp\": \"")); Serial.print(millis()); Serial.print(F("\", \"sensors\": [ "));
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
 
-		float humidity = sensors[i].readHumidity();
-		float temperature = sensors[i].readTemperature();
-		
+		float humidity = sensors[i]->readHumidity();
+		float temperature = sensors[i]->readTemperature();
+
 		if(sensor_data_is_bad(humidity, temperature)) {
 			continue;
 		}
 
-		Serial.print(F(", \"humidity_percent_")); Serial.print(i); Serial.print(F("\": \"")); Serial.print(float_to_string(humidity)); Serial.print(F("\""));
-		Serial.print(F(", \"temperature_celsius_")); Serial.print(i); Serial.print(F("\": \"")); Serial.print(float_to_string(temperature)); Serial.print(F("\""));
+		if (first_loop) {
+			first_loop = false;
+		} else {
+			Serial.print(", ");
+		}
+
+		Serial.print(F("{ \"humidity_percent\": \"")); Serial.print(float_to_string(humidity)); Serial.print(F("\", "));
+		Serial.print(F("\"temperature_celsius\": \"")); Serial.print(float_to_string(temperature)); Serial.print(F("\" }"));
 	}
 
-	Serial.println(F(" }"));
+	Serial.println(F(" ] }"));
 }
 

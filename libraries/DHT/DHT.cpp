@@ -1,25 +1,23 @@
-/*
- * DHT library
- * MIT license
- * written by Adafruit Industries
- * modified by Craig J Perry
- *
- */
+/* DHT library 
 
+MIT license
+written by Adafruit Industries
+*/
 
 #include "DHT.h"
 
-
-DHT::DHT() {}
-
-void DHT::begin(uint8_t pin, uint8_t type, uint8_t count) {
+DHT::DHT(uint8_t pin, uint8_t type, uint8_t count) {
   _pin = pin;
   _type = type;
   _count = count;
-  _lastreadtime = 0;
   firstreading = true;
+}
+
+void DHT::begin(void) {
+  // set up the pins!
   pinMode(_pin, INPUT);
   digitalWrite(_pin, HIGH);
+  _lastreadtime = 0;
 }
 
 //boolean S == Scale.  True == Farenheit; False == Celcius
@@ -32,7 +30,7 @@ float DHT::readTemperature(bool S) {
       f = data[2];
       if(S)
       	f = convertCtoF(f);
-
+      	
       return f;
     case DHT22:
     case DHT21:
@@ -56,7 +54,7 @@ float DHT::convertCtoF(float c) {
 }
 
 float DHT::convertFtoC(float f) {
-  return (f - 32) * 5 / 9;
+  return (f - 32) * 5 / 9; 
 }
 
 float DHT::readHumidity(void) {
@@ -81,13 +79,13 @@ float DHT::readHumidity(void) {
 float DHT::computeHeatIndex(float tempFahrenheit, float percentHumidity) {
   // Adapted from equation at: https://github.com/adafruit/DHT-sensor-library/issues/9 and
   // Wikipedia: http://en.wikipedia.org/wiki/Heat_index
-  return -42.379 +
-           2.04901523 * tempFahrenheit +
+  return -42.379 + 
+           2.04901523 * tempFahrenheit + 
           10.14333127 * percentHumidity +
           -0.22475541 * tempFahrenheit*percentHumidity +
           -0.00683783 * pow(tempFahrenheit, 2) +
-          -0.05481717 * pow(percentHumidity, 2) +
-           0.00122874 * pow(tempFahrenheit, 2) * percentHumidity +
+          -0.05481717 * pow(percentHumidity, 2) + 
+           0.00122874 * pow(tempFahrenheit, 2) * percentHumidity + 
            0.00085282 * tempFahrenheit*pow(percentHumidity, 2) +
           -0.00000199 * pow(tempFahrenheit, 2) * pow(percentHumidity, 2);
 }
@@ -118,7 +116,7 @@ boolean DHT::read(void) {
   _lastreadtime = millis();
 
   data[0] = data[1] = data[2] = data[3] = data[4] = 0;
-
+  
   // pull the pin high and wait 250 milliseconds
   digitalWrite(_pin, HIGH);
   delay(250);
@@ -158,7 +156,7 @@ boolean DHT::read(void) {
   }
 
   interrupts();
-
+  
   /*
   Serial.println(j, DEC);
   Serial.print(data[0], HEX); Serial.print(", ");
@@ -170,13 +168,12 @@ boolean DHT::read(void) {
   */
 
   // check we read 40 bits and that the checksum matches
-  if ((j >= 40) &&
+  if ((j >= 40) && 
       (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF)) ) {
     return true;
   }
-
+  
 
   return false;
 
 }
-
